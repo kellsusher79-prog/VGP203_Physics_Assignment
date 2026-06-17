@@ -75,6 +75,19 @@ public class RaceManager : MonoBehaviour
         raceWon = true;
 
         statusText.text = "You win! Final Time: " + raceTimer.ToString("F1") + " seconds";
+
+        TopDownCarController car = FindFirstObjectByType<TopDownCarController>();
+
+        if (car != null)
+        {
+            car.StopDriving();
+        }
+
+        if (GameAudio.Instance != null)
+        {
+            GameAudio.Instance.PlayWinSound();
+        }
+
         Debug.Log("You win! Race complete.");
     }
 

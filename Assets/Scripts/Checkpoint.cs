@@ -20,6 +20,12 @@ public class Checkpoint : MonoBehaviour
             if (wasCorrectCheckpoint)
             {
                 collected = true;
+
+                if (GameAudio.Instance != null)
+                {
+                    GameAudio.Instance.PlayCheckpointSound();
+                }
+
                 gameObject.SetActive(false);
             }
         }

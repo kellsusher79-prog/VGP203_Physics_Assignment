@@ -15,6 +15,7 @@ public class TopDownCarController : MonoBehaviour
     private Rigidbody2D rb;
     private float moveInput;
     private float turnInput;
+    private bool canDrive = true;
 
     private void Awake()
     {
@@ -23,11 +24,17 @@ public class TopDownCarController : MonoBehaviour
 
     private void Update()
     {
+        if (!canDrive)
+            return;
+
         ReadInput();
     }
 
     private void FixedUpdate()
     {
+        if (!canDrive)
+            return;
+
         ApplyEngineForce();
         ApplySteering();
         LimitSpeed();
@@ -82,7 +89,6 @@ public class TopDownCarController : MonoBehaviour
             return;
 
         float movingDirection = Vector2.Dot(rb.linearVelocity, transform.up) >= 0 ? 1f : -1f;
-
         float rotationAmount = -turnInput * turnSpeed * movingDirection * Time.fixedDeltaTime;
 
         rb.MoveRotation(rb.rotation + rotationAmount);
@@ -94,5 +100,14 @@ public class TopDownCarController : MonoBehaviour
         {
             rb.linearVelocity = rb.linearVelocity.normalized * maxSpeed;
         }
+    }
+
+    public void StopDriving()
+    {
+        canDrive = false;
+        moveInput = 0f;
+        turnInput = 0f;
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
 }

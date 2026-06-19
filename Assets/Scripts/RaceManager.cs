@@ -1,5 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+using UnityEngine.InputSystem;
+#endif
 
 public class RaceManager : MonoBehaviour
 {
@@ -29,11 +34,30 @@ public class RaceManager : MonoBehaviour
 
     private void Update()
     {
+        CheckRestartInput();
+
         if (raceWon)
             return;
 
         raceTimer += Time.deltaTime;
         UpdateTimerText();
+    }
+
+    private void CheckRestartInput()
+    {
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        Keyboard keyboard = Keyboard.current;
+
+        if (keyboard != null && keyboard.rKey.wasPressedThisFrame)
+        {
+            RestartRace();
+        }
+#else
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RestartRace();
+        }
+#endif
     }
 
     public bool TryCollectCheckpoint(int checkpointNumber)
@@ -74,7 +98,7 @@ public class RaceManager : MonoBehaviour
 
         raceWon = true;
 
-        statusText.text = "You win! Final Time: " + raceTimer.ToString("F1") + " seconds";
+        statusText.text = "You win! Final Time: " + raceTimer.ToString("F1") + " seconds. Press R to restart.";
 
         TopDownCarController car = FindFirstObjectByType<TopDownCarController>();
 
@@ -91,12 +115,17 @@ public class RaceManager : MonoBehaviour
         Debug.Log("You win! Race complete.");
     }
 
+    public void RestartRace()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     private void UpdateStatusText()
     {
         if (statusText == null)
             return;
 
-        statusText.text = "Checkpoint " + nextCheckpoint + " / " + totalCheckpoints;
+        statusText.text = "Checkpoint " + nextCheckpoint + " / " + totalCheckpoints + "    Press R to restart";
     }
 
     private void UpdateTimerText()
